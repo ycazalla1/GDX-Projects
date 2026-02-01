@@ -60,7 +60,7 @@ public class Player extends Actor {
         currentAnimation = idleBack;
 
         setSize(90, 130);
-        setPosition(300, 300);
+        setPosition(300, 700);
     }
 
     public void moveTo(float targetX, float targetY) {
