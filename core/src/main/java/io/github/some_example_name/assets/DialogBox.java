@@ -18,7 +18,9 @@ public class DialogBox extends Table {
     private Label nameLabel;
     private Label textLabel;
     private Image portrait;
+    private int indexI, indexF;
     private boolean finished;
+    private Runnable onFinishCallback;
     public static String[] dialogs = {
         "He de trobar el meu marit, em va dir que estava en els sofàs de l'esquerra.",
         "Oooh déu meu!! És mort.",
@@ -26,8 +28,8 @@ public class DialogBox extends Table {
         "Sembla una nota... Segurament hi haurà més d'una.",
         "Penso trobar-les totes i descobrir quí és l'assassí!!! Me les pagarà!!!",
         "Oooh, una nova nota!",
-        "En una nota diu, que només tinc tres minuts per descobrir quí és l'assassí.",
-        "He trobat cinc notes, això em porta a deduïr la següent pista."
+        "En aquesta nota diu, que només tinc tres minuts per descobrir quí és l'assassí.",
+        "He trobat tres notes, això em porta a deduïr la següent pista."
     };
 
     public DialogBox(Skin skinNom, Skin skinText) {
@@ -86,6 +88,36 @@ public class DialogBox extends Table {
         return finished;
     }
 
+    public void typeTextMultiple(int inici, int fi) {
+        indexI = inici;
+        indexF = fi;
+        nextDialog();
+    }
+
+    private void nextDialog() {
+        if (indexI >= indexF) {
+            remove();
+            if (onFinishCallback != null) {
+                onFinishCallback.run(); // ejecuta lo que haya que hacer al terminar
+            }
+            return;
+        }
+        textLabel.setText("");
+        typeText(dialogs[indexI]);
+    }
+
+    public void onScreenClick() {
+        if (finished) {
+            indexI++;
+            nextDialog();
+        } else {
+            // Completa el texto actual instantáneamente
+            textLabel.setText("");
+            textLabel.setText(dialogs[indexI]);
+            finished = true;
+        }
+    }
+
     public void typeText(String fullText) {
         textLabel.setText("");
         finished = false;
@@ -104,6 +136,10 @@ public class DialogBox extends Table {
                 }
             }
         }, 0, 0.03f);
+    }
+
+    public void setOnFinishCallback(Runnable callback) {
+        this.onFinishCallback = callback;
     }
 
 }

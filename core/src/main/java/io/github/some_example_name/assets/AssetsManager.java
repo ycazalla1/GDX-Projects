@@ -13,6 +13,7 @@ public class AssetsManager {
                                 backButtonAtlas;
     public static TextureAtlas notesIconAtlas, pistesIconAtlas;
     public static TextureAtlas dialogNomAtlas, dialogTextAtlas;
+    public static TextureAtlas timerAtlas;
 
     public static void load() {
         // Carraguem les imatges
@@ -21,8 +22,6 @@ public class AssetsManager {
         player = new Texture(Gdx.files.internal("img/PJ/pj_f_1.png"));
         player4K = new Texture(Gdx.files.internal("img/PJ/pj_f_investic_4k.png"));
         dialogBox = new Texture(Gdx.files.internal("img/dialog/pj_f_investic_dialog.png"));
-
-
 
         // --------------- BUTTONS ---------------
         // Button start
@@ -72,6 +71,11 @@ public class AssetsManager {
 
         dialogTextAtlas = new TextureAtlas(
             Gdx.files.internal("fonts/quantico_regular.atlas")
+        );
+
+        // --------------- TIMER ---------------
+        timerAtlas = new TextureAtlas(
+            Gdx.files.internal("fonts/quantico_bold.atlas")
         );
 
         //Carreguem la música i el so/música
