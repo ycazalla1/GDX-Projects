@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 public class AssetsManager {
     public static BitmapFont font;
-    public static Texture fonsMenu, fonsJoc, player, player4K, dialogBox;
+    public static Texture killerVera, killerElena, killerVictor, killerTobias;
+    public static Texture fonsMenu, fonsJoc, player, fonsInventory, player4K, dialogBox, pistesImg;
     public static TextureAtlas startButtonAtlas, optionsButtonAtlas, exitButtonAtlas,
                                 optionsIconButtonAtlas, pauseButtonAtlas, menuButtonAtlas,
                                 backButtonAtlas;
@@ -19,9 +20,20 @@ public class AssetsManager {
         // Carraguem les imatges
         fonsMenu = new Texture(Gdx.files.internal("img/menugame.png"));
         fonsJoc = new Texture(Gdx.files.internal("img/disco.png"));
-        player = new Texture(Gdx.files.internal("img/PJ/pj_f_1.png"));
+        fonsInventory = new Texture(Gdx.files.internal("img/inventory.png"));
+
+        // Player
+        player = new Texture(Gdx.files.internal("img/PJ/pj_f_investic_1.png"));
+
+        // Killers
+        killerVera = new Texture(Gdx.files.internal("img/PJ/pj_f_1.png"));
+        killerElena = new Texture(Gdx.files.internal("img/PJ/pj_f_2.png"));
+        killerVictor = new Texture(Gdx.files.internal("img/PJ/pj_m_1.png"));
+        killerTobias = new Texture(Gdx.files.internal("img/PJ/pj_m_2.png"));
+
         player4K = new Texture(Gdx.files.internal("img/PJ/pj_f_investic_4k.png"));
         dialogBox = new Texture(Gdx.files.internal("img/dialog/pj_f_investic_dialog.png"));
+        pistesImg = new Texture(Gdx.files.internal("img/notes/pistes.png"));
 
         // --------------- BUTTONS ---------------
         // Button start
@@ -52,6 +64,10 @@ public class AssetsManager {
         // Button pause
         pauseButtonAtlas = new TextureAtlas(
             Gdx.files.internal("buttons/button_pause/button_pause.atlas")
+        );
+
+        backButtonAtlas = new TextureAtlas(
+            Gdx.files.internal("buttons/button_back/button_back.atlas")
         );
 
         // --------------- ICONS ---------------
@@ -85,7 +101,7 @@ public class AssetsManager {
         // Alliberem els recursos gràfics i d'audio
         if (fonsMenu != null) fonsMenu.dispose();
         if (fonsJoc != null) fonsJoc.dispose();
-        if (player != null) player.dispose();
+        if (killerVera != null) killerVera.dispose();
         if (startButtonAtlas != null) startButtonAtlas.dispose();
         if (optionsButtonAtlas != null) optionsButtonAtlas.dispose();
         if (exitButtonAtlas != null) exitButtonAtlas.dispose();

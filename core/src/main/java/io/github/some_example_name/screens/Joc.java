@@ -9,14 +9,13 @@
     import com.badlogic.gdx.Screen;
     import com.badlogic.gdx.maps.MapLayer;
     import com.badlogic.gdx.maps.MapObject;
-    import com.badlogic.gdx.maps.MapProperties;
     import com.badlogic.gdx.maps.objects.RectangleMapObject;
     import com.badlogic.gdx.maps.tiled.TiledMap;
-    import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
     import com.badlogic.gdx.maps.tiled.TmxMapLoader;
     import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
     import com.badlogic.gdx.math.Rectangle;
-    import com.badlogic.gdx.math.Vector3;
+    import com.badlogic.gdx.math.Vector2;
+    import com.badlogic.gdx.scenes.scene2d.Actor;
     import com.badlogic.gdx.scenes.scene2d.InputEvent;
     import com.badlogic.gdx.scenes.scene2d.Stage;
     import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -25,10 +24,7 @@
     import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
     import com.badlogic.gdx.utils.viewport.FitViewport;
 
-    import io.github.some_example_name.assets.AssetsManager;
-    import io.github.some_example_name.assets.DialogBox;
-    import io.github.some_example_name.assets.Player;
-    import io.github.some_example_name.assets.TimerGame;
+    import io.github.some_example_name.assets.*;
 
     public class Joc implements Screen {
         private Game joc;
@@ -36,19 +32,26 @@
         private Batch batch;
         private OrthographicCamera worldCamera, uiCamera;
         private TiledMap map;
-        private Skin skinOptionsIcon, skinNotes, skinPistes, skinNomFont, skinTextFont, skinTimer;
+        private Skin skinOptionsIcon, skinInventory, skinPistes, skinNomFont, skinTextFont, skinTimer;
         private Label timerLabel;
-        private Button btnOptionsIcon, btnNotes;
+        private Button btnOptionsIcon, btnInventory;
         private Button btnPistes1, btnPistes2, btnPistes3, btnPistes4, btnPistes5,
             btnPistes6, btnPistes7, btnPistes8, btnPistes9, btnPistes10,
             btnPistes11, btnPistes12;
         private Button[] btns;
+        private Killer[] killers = {
+            new Elena(0),
+            new Vera(0),
+            new Victor(1),
+            new Tobias(1)
+        };;
         private OrthogonalTiledMapRenderer mapRenderer;
         private TimerGame timerGame;
         private static final float TOTAL_TIME = 180f; // 3 minuts en segons
         private Player player;
         private DialogBox db;
         private Inventory inventory;
+        private InputMultiplexer multiplexer;
         public static final float WORLD_WIDTH = 3000;
         public static final float WORLD_HEIGHT = 2000;
         //private CollisionManager collisionManager;
@@ -56,12 +59,8 @@
         private float targetY;
         private boolean dialogShownTile15 = false;
 
-
-
         public Joc(Game joc) {
-
             this.joc = joc;
-            this.inventory = new Inventory(this.joc);
             this.timerGame = new TimerGame();
 
             // --- CÀMERA DEL MÓN ---
@@ -78,57 +77,56 @@
             batch = worldStage.getBatch();
 
             // Zoom inicial
-            worldCamera.zoom = 0.3f;
+            //worldCamera.zoom = 0.3f;
 
             // --- CÀMERA DE UI (FIXA) ---
             uiCamera = new OrthographicCamera();
             uiCamera.setToOrtho(false, 1024, 768);
 
-            FitViewport uiViewport = new FitViewport(1024, 768, uiCamera);
+            FitViewport uiViewport = new FitViewport(1724, 768, uiCamera);
             uiStage = new Stage(uiViewport);
 
             // Per rebre clics els botons
-            InputMultiplexer multiplexer = new InputMultiplexer();
-            multiplexer.addProcessor(uiStage);
-            multiplexer.addProcessor(worldStage);
-            Gdx.input.setInputProcessor(multiplexer);
+            multiplexer = new InputMultiplexer();
+            //multiplexer.addProcessor(uiStage);
+            //multiplexer.addProcessor(worldStage);
 
+            // ---- MAPA TILED ----
+            map = new TmxMapLoader().load("escenarios/disco/discoInici.tmx");
+            mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
 
-    //        this.joc = joc;
-    //
-    //        camara = new OrthographicCamera();
-    //
-    //
-    //        camara.setToOrtho(false, 100, 100);
-    //
-    //
-    //        // Crear viewport amb les mateixes dimensions
-    //        FitViewport viewport = new FitViewport(3024, 768, camara);
-    //
-    //        stage = new Stage(viewport);
-    //
-    //
-    //
-    //        batch = stage.getBatch();
+            // ------- PERSONATGE -------
+            player = new Player();
+            worldStage.addActor(player);
+
+            this.inventory = new Inventory(this.joc, this, killers[showKillers()]);
+
+            skinPistes = new Skin();
+            skinPistes.addRegions(AssetsManager.pistesIconAtlas);
+            skinPistes.load(Gdx.files.internal(
+                "icons/pistes/pistes.json"
+            ));
+
+            pistes();
         }
 
         @Override
         public void show() {
 
             // Input para Scene2D
-            Gdx.input.setInputProcessor(worldStage);
+           // Gdx.input.setInputProcessor(worldStage);
 
-            // ---------- FONS ----------
-            /*Image fons = new Image(AssetsManager.fonsJoc);
-            fons.setSize(
-                WORLD_WIDTH,
-                WORLD_HEIGHT
+
+            Actor worldInput = new Actor();
+            worldInput.setBounds(
+                0, 0,
+                worldStage.getWidth(),
+                worldStage.getHeight()
             );
-            stage.addActor(fons);*/
 
-            // ---- MAPA TILED ----
-            map = new TmxMapLoader().load("escenarios/disco/discoInici.tmx");
-            mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
+//            // ---- MAPA TILED ----
+//            map = new TmxMapLoader().load("escenarios/disco/discoInici.tmx");
+//            mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
 
             // Inicializar el gestor de colisiones
             //collisionManager = new CollisionManager("escenarios/disco/disoMapPrueba.tmx");
@@ -140,16 +138,10 @@
                 "buttons/button_options_icon/button_options_icon.json"
             ));
 
-            skinNotes = new Skin();
-            skinNotes.addRegions(AssetsManager.notesIconAtlas);
-            skinNotes.load(Gdx.files.internal(
+            skinInventory = new Skin();
+            skinInventory.addRegions(AssetsManager.notesIconAtlas);
+            skinInventory.load(Gdx.files.internal(
                 "icons/notes/notes.json"
-            ));
-
-            skinPistes = new Skin();
-            skinPistes.addRegions(AssetsManager.pistesIconAtlas);
-            skinPistes.load(Gdx.files.internal(
-                "icons/pistes/pistes.json"
             ));
 
             // --------- BOTONS ---------
@@ -162,21 +154,40 @@
             );
 
             // Notes Icon
-            btnNotes = new Button(skinNotes);
-            btnNotes.setSize(120, 120);
-            btnNotes.setPosition(
+            btnInventory = new Button(skinInventory);
+            btnInventory.setSize(150, 170);
+            btnInventory.setPosition(
                 0,
                 0
             );
 
-            // Pistes Icon
-            pistes();
+            // Acció del botó Notes
+            btnInventory.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    Gdx.app.log("INVENTORY", "Botó Notes");
+                    Gdx.app.log("INVENTORY", "Notes: " + inventory.getNotes());
+                    joc.setScreen(inventory);
+                    //dispose();
+                }
+            });
 
-            // ------- PERSONATGE -------
-            player = new Player();
-            worldStage.addActor(player);
+//            // Agregar un actor de fondo para ver si está capturando los eventos
+//            Actor background = new Actor();
+//            background.setBounds(0, 0, uiStage.getWidth(), uiStage.getHeight());
+//            background.setTouchable(Touchable.enabled);
+//            background.addListener(new ClickListener() {
+//                @Override
+//                public void clicked(InputEvent event, float x, float y) {
+//                    Gdx.app.log("BACKGROUND", "Click en fondo de UI en: " + x + ", " + y);
+//                }
+//            });
+//            uiStage.addActor(background);
             uiStage.addActor(btnOptionsIcon);
-            uiStage.addActor(btnNotes);
+            uiStage.addActor(btnInventory);
+
+            // Pistes Icon
+            //pistes();
 
             // --------- DIÀLEG ---------
             skinNomFont = new Skin(Gdx.files.internal("fonts/quantico_bold.json"), AssetsManager.dialogNomAtlas);
@@ -189,6 +200,72 @@
             timerLabel = new Label("03:00", skinTimer);
             timerLabel.setPosition(40, 700);
             //uiStage.addActor(timerLabel);
+
+            uiStage.addListener(new ClickListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    Gdx.app.log("UI_STAGE", "Touch down en UI: " + x + ", " + y);
+                    return false;
+                }
+            });
+
+            //multiplexer.addProcessor(new InputAdapter() {
+            worldStage.addListener(new ClickListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                    Vector2 uiCoords = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+
+                    uiStage.screenToStageCoordinates(uiCoords);
+
+                    Actor hitActor = uiStage.hit(uiCoords.x, uiCoords.y, true);
+                    if (hitActor != null) {
+
+                        return false;
+                    }
+
+                    if (db.hasParent()) {
+                        db.onScreenClick();
+                        return true; // consumimos para que no siga al mundo
+                    }
+
+                    // Click en el mundo → mover jugador
+                    float targetX = x - player.getWidth() / 2f;
+                    float targetY = y - (player.getHeight() - 95) / 2f;
+
+                    if (canMove(targetX, targetY)) {
+                        player.moveTo(targetX, targetY);
+                    } else {
+                        if (inventory.getNotes() == 0) {
+                            db.typeTextMultiple(0, 1);
+                            uiStage.addActor(db);
+                        }
+                        Gdx.app.log("MOVIMIENTO", "No se puede mover");
+                    }
+
+                    // 4️⃣ Dialogos especiales
+                    if (((int)(player.getX() / 32)) <= 15 && !dialogShownTile15) {
+                        dialogShownTile15 = true;
+                        db.typeTextMultiple(1, 5);
+                        uiStage.addActor(db);
+                        inventory.incrementarNotes();
+                        db.setOnFinishCallback(() -> {
+                            Gdx.app.log("INVENTORY", "Notes: " + inventory.getNotes());
+                            if (inventory.getNotes() == 1) showAllNotes();
+                            else if (inventory.getNotes() == 2) setTimerLabel(0);
+                            map = new TmxMapLoader().load("escenarios/disco/disoMapPrueba.tmx");
+                            mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
+                        });
+                    }
+
+                    return true; // click consumido
+                }
+            });
+
+
+            multiplexer.addProcessor(uiStage);
+            multiplexer.addProcessor(worldStage);
+            Gdx.input.setInputProcessor(multiplexer);
         }
 
         @Override
@@ -204,53 +281,69 @@
             );
             worldCamera.update();
 
-
-            if (Gdx.input.justTouched()) {
-                if (db.hasParent()) {
-                    db.onScreenClick();
-                } else {
-                    Vector3 touch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-                    worldStage.getCamera().unproject(touch);
-
-                    targetX = touch.x - player.getWidth() / 2f;
-                    targetY = touch.y - (player.getHeight() - 95) / 2f;
-
-                    if (canMove(targetX, targetY)) {
-
-                        player.moveTo(targetX, targetY);
-
-//                        if (db.isFinished()) {
-//                            db.remove(); // elimina del stage
+//            if (Gdx.input.justTouched()) {
+//                if (db.hasParent()) {
+//                    db.onScreenClick();
+//                } else {
+//
+//                    // ---------- UI ----------
+//                    Vector2 uiTouch = new Vector2(
+//                        Gdx.input.getX(),
+//                        Gdx.input.getY()
+//                    );
+//                    uiStage.screenToStageCoordinates(uiTouch);
+//
+//                    Actor uiHit = uiStage.hit(uiTouch.x, uiTouch.y, true);
+//
+//                    // Si es toca la UI, Scene2D s'encarrega
+//                    if (uiHit != null) {
+//                        Gdx.app.log("TOUCH", "UI");
+//                        return;
+//                    }
+//
+//                    // ---------- MÓN ----------
+//                    Vector3 touch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+//                    worldStage.getCamera().unproject(touch);
+//
+//                    targetX = touch.x - player.getWidth() / 2f;
+//                    targetY = touch.y - (player.getHeight() - 95) / 2f;
+//
+//                    if (canMove(targetX, targetY)) {
+//
+//                        player.moveTo(targetX, targetY);
+//
+////                        if (db.isFinished()) {
+////                            db.remove(); // elimina del stage
+////                        }
+//
+//                    } else {
+//                        //db.setText(DialogBox.dialogs[0]);
+//                        if (inventory.getNotes() == 0) {
+//                            db.typeTextMultiple(0, 1);
+//                            uiStage.addActor(db);
 //                        }
-
-                    } else {
-                        //db.setText(DialogBox.dialogs[0]);
-                        if (inventory.getNotes() == 0) {
-                            db.typeTextMultiple(0, 1);
-                            uiStage.addActor(db);
-                        }
-                        Gdx.app.log("MOVIMIENTO", "No se puede mover");
-                    }
-
-                    if (((int)(player.getX() / 32)) <= 15 && !dialogShownTile15) {
-                        dialogShownTile15 = true;
-                        db.typeTextMultiple(1, 5);
-                        uiStage.addActor(db);
-                        db.setOnFinishCallback(() -> {
-                            inventory.incrementarNotes();
-                            if (inventory.getNotes() == 1) {
-                                showAllPistes();
-                            }
-                            map = new TmxMapLoader().load("escenarios/disco/disoMapPrueba.tmx");
-                            mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
-                        });
-                    }
-
-                    Gdx.app.log("MOVIMIENTO",
-                        "Objetivo: " + targetX + ", " + targetY +
-                            " | Tile: " + ((int)(targetX/32)) + ", " + ((int)(targetY/32)));
-                }
-            }
+//                        Gdx.app.log("MOVIMIENTO", "No se puede mover");
+//                    }
+//
+//                    if (((int)(player.getX() / 32)) <= 15 && !dialogShownTile15) {
+//                        dialogShownTile15 = true;
+//                        db.typeTextMultiple(1, 5);
+//                        uiStage.addActor(db);
+//                        db.setOnFinishCallback(() -> {
+//                            inventory.incrementarNotes();
+//                            if (inventory.getNotes() == 1) {
+//                                showAllPistes();
+//                            } else if (inventory.getNotes() == 2) setTimerLabel(delta);
+//                            map = new TmxMapLoader().load("escenarios/disco/disoMapPrueba.tmx");
+//                            mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
+//                        });
+//                    }
+//
+//                    Gdx.app.log("MOVIMIENTO",
+//                        "Objetivo: " + targetX + ", " + targetY +
+//                            " | Tile: " + ((int)(targetX/32)) + ", " + ((int)(targetY/32)));
+//                }
+//            }
 
 
             // ---- DIBUIXAR MAPA ----
@@ -317,60 +410,6 @@
             }
 
             return true;
-        }
-
-        // Prova 3 - isTileBlocked
-        private boolean isTileBlocked(float x, float y) {
-
-            TiledMapTileLayer layer =
-                (TiledMapTileLayer) map.getLayers().get("Collisions");
-
-            if (layer == null) {
-                Gdx.app.log("ERROR", "No existe la capa 'Collisions'");
-                return false;
-            }
-
-            // Pruebas
-            TiledMapTileLayer.Cell cell1 = layer.getCell(9, 37);
-            TiledMapTileLayer.Cell cell2 = layer.getCell(9, 41);
-
-            if (cell1 != null && cell1.getTile() != null) {
-                int gid1 = cell1.getTile().getId();
-                Gdx.app.log("TILE_DEBUG", "GID CON COLLISION = " + gid1);
-            }
-
-            if (cell2 != null && cell2.getTile() != null) {
-                int gid1 = cell2.getTile().getId();
-                Gdx.app.log("TILE_DEBUG", "GID SIN COLLISION = " + gid1);
-            }
-
-            float tileWidth = layer.getTileWidth();
-            float tileHeight = layer.getTileHeight();
-
-    //        int tileX = (int)(x / tileWidth);
-    //        int tileY = (int)(y / tileHeight);
-            int tileX = (int)((x + 0.1f) / tileWidth);
-            int tileY = (int)((y + 0.1f) / tileHeight);
-
-
-            // Fuera del mapa = colisión
-            if (tileX < 0 || tileX >= layer.getWidth() ||
-                tileY < 0 || tileY >= layer.getHeight()) {
-                return true;
-            }
-
-            TiledMapTileLayer.Cell cell = layer.getCell(tileX, tileY);
-
-            // Celda vacía = no colisión
-            if (cell == null || cell.getTile() == null) {
-                return false;
-            }
-
-            MapProperties props = cell.getTile().getProperties();
-
-            // Propiedad collision
-            return props.containsKey("collision") &&
-                Boolean.parseBoolean(props.get("collision").toString());
         }
 
         private void pistes() {
@@ -564,7 +603,23 @@
             }
         }
 
-        private void showAllPistes() {
+        private void setTimerLabel(float delta) {
+            timerGame.update(delta);
+            float remainingTime = TOTAL_TIME - timerGame.getElapsedTime();
+
+            if (remainingTime < 0) {
+                remainingTime = 0;
+            }
+
+            // Convertir a minutos y segundos
+            int minutes = (int)(remainingTime / 60);
+            int seconds = (int)(remainingTime % 60);
+
+            // Format MM:SS
+            timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+        }
+
+        private void showAllNotes() {
             btnPistes1.remove();
             worldStage.addActor(btnPistes2);
             worldStage.addActor(btnPistes3);
@@ -577,5 +632,34 @@
             worldStage.addActor(btnPistes10);
             worldStage.addActor(btnPistes11);
             worldStage.addActor(btnPistes12);
+        }
+
+        private int showKillers() {
+
+            int k = 0;
+
+            int[][] posicions = {
+                {600, 1000},
+                {600, 860},
+                {935, 1000},
+                {935, 860}
+            };
+
+            int killer = (int) (Math.random() * 3);
+
+            for (int i = 0; i < killers.length; i++) {
+                killers[i].setPosition(posicions[i][0], posicions[i][1]);
+
+                if (i == killer) {
+                    k = i;
+                    killers[i].setIsKiller(true);
+                    Gdx.app.log("ASSASSÍ", "NOM " + killers[i].getNom());
+                }
+
+                // Añadir al stage
+                worldStage.addActor(killers[i]);
+            }
+
+            return k;
         }
     }

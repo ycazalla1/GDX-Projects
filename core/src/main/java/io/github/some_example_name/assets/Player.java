@@ -17,6 +17,7 @@ public class Player extends Actor {
     private boolean moving = false;
 
     private float stateTime = 0f;
+    private float frameDurationIdle = 0.30f, frameDurationWalk = 0.15f;
     private float speed = 200f;
     private Vector2 direction = new Vector2();
     private Vector2 target = new Vector2();
@@ -41,19 +42,19 @@ public class Player extends Actor {
 
         // ---------- CREACIÓ ANIMACIONS ----------
         // Animacions quiet
-        idleFront = new Animation<>(0.30f, frames[24][0], frames[24][1]);
-        idleBack = new Animation<>(0.30f, frames[22][0], frames[22][1]);
-        idleLeft = new Animation<>(0.30f, frames[23][0], frames[23][1]);
-        idleRight = new Animation<>(0.30f, frames[25][0], frames[25][1]);
+        idleFront = new Animation<>(frameDurationIdle, frames[24][0], frames[24][1]);
+        idleBack = new Animation<>(frameDurationIdle, frames[22][0], frames[22][1]);
+        idleLeft = new Animation<>(frameDurationIdle, frames[23][0], frames[23][1]);
+        idleRight = new Animation<>(frameDurationIdle, frames[25][0], frames[25][1]);
 
         // Animacions de moviment
-        walkFront = new Animation<>(0.15f, frames[10][0], frames[10][1], frames[10][2],
+        walkFront = new Animation<>(frameDurationWalk, frames[10][0], frames[10][1], frames[10][2],
             frames[10][3], frames[10][4], frames[10][5], frames[10][6], frames[10][7], frames[10][8]);
-        walkBack = new Animation<>(0.15f, frames[8][0], frames[8][1], frames[8][2],
+        walkBack = new Animation<>(frameDurationWalk, frames[8][0], frames[8][1], frames[8][2],
             frames[8][3], frames[8][4], frames[8][5], frames[8][6], frames[8][7], frames[8][8]);
-        walkLeft = new Animation<>(0.15f, frames[9][0], frames[9][1], frames[9][2],
+        walkLeft = new Animation<>(frameDurationWalk, frames[9][0], frames[9][1], frames[9][2],
             frames[9][3], frames[9][4], frames[9][5], frames[9][6], frames[9][7], frames[9][8]);
-        walkRight = new Animation<>(0.15f, frames[11][0], frames[11][1], frames[11][2],
+        walkRight = new Animation<>(frameDurationWalk, frames[11][0], frames[11][1], frames[11][2],
             frames[11][3], frames[11][4], frames[11][5], frames[11][6], frames[11][7], frames[11][8]);
 
 
@@ -144,15 +145,6 @@ public class Player extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         stateTime += Gdx.graphics.getDeltaTime();
         TextureRegion frame = currentAnimation.getKeyFrame(stateTime, true);
-//        TextureRegion frame =
-//            idleFront.getKeyFrame(stateTime, true);
-//            idleBack.getKeyFrame(stateTime, true);
-//            idleLeft.getKeyFrame(stateTime, true);
-//            idleRight.getKeyFrame(stateTime, true);
-//            walkFront.getKeyFrame(stateTime, true);
-//            walkBack.getKeyFrame(stateTime, true);
-//            walkLeft.getKeyFrame(stateTime, true);
-//            walkRight.getKeyFrame(stateTime, true);
 
         batch.draw(frame, getX(), getY(), getWidth(), getHeight());
     }

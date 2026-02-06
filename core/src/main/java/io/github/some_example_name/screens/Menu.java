@@ -84,7 +84,7 @@ public class Menu implements Screen {
             384 - 75
         );
 
-        // Acció del botó
+        // Acció del botó Play
         btnPlay.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -101,6 +101,7 @@ public class Menu implements Screen {
             384 - 75
         );
 
+        // Acció del botó Exit
         btnExit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
