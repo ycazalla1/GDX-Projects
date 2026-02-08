@@ -5,8 +5,13 @@ public class Tobias extends Killer {
     public Tobias(int idle) {
         super(AssetsManager.killerTobias, idle, "Tobias");
         pistes = pistesTobias;
-
+        dialogs = dialogsTobias;
     }
+
+    public static final String[] dialogsTobias = {
+        "No sóc de parlar molt, però sempre intento estar on més se'm necessiti.",
+        "Cadascú ho viu a la seva manera; jo només vaig intentar ajudar en el que vaig poder."
+    };
 
     public static final String[] pistesTobias = {
         "Fa molt de temps que són amics; malgrat això, hem arribat a aquesta situació. Va estar a prop de la zona.",

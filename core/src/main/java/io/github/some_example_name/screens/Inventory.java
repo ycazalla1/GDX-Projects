@@ -167,7 +167,6 @@ public class Inventory implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 joc.setScreen(screen);
-                //dispose();
             }
         });
 

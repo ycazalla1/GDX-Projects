@@ -19,6 +19,7 @@
     import com.badlogic.gdx.scenes.scene2d.InputEvent;
     import com.badlogic.gdx.scenes.scene2d.Stage;
     import com.badlogic.gdx.scenes.scene2d.ui.Button;
+    import com.badlogic.gdx.scenes.scene2d.ui.Image;
     import com.badlogic.gdx.scenes.scene2d.ui.Label;
     import com.badlogic.gdx.scenes.scene2d.ui.Skin;
     import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -32,9 +33,10 @@
         private Batch batch;
         private OrthographicCamera worldCamera, uiCamera;
         private TiledMap map;
-        private Skin skinOptionsIcon, skinInventory, skinPistes, skinNomFont, skinTextFont, skinTimer;
+        private Skin skinOptionsIcon, skinInventory, skinInvestigation, skinPistes, skinNomFont,
+            skinTextFont, skinTimer;
         private Label timerLabel;
-        private Button btnOptionsIcon, btnInventory;
+        private Button btnOptionsIcon, btnInventory, btnInvestigation;
         private Button btnPistes1, btnPistes2, btnPistes3, btnPistes4, btnPistes5,
             btnPistes6, btnPistes7, btnPistes8, btnPistes9, btnPistes10,
             btnPistes11, btnPistes12;
@@ -49,15 +51,19 @@
         private TimerGame timerGame;
         private static final float TOTAL_TIME = 180f; // 3 minuts en segons
         private Player player;
+        private Killer killer;
         private DialogBox db;
         private Inventory inventory;
+        private Options options;
+        private Investigation investigation;
+        private Image bolaDisco;
         private InputMultiplexer multiplexer;
-        public static final float WORLD_WIDTH = 3000;
-        public static final float WORLD_HEIGHT = 2000;
-        //private CollisionManager collisionManager;
-        private float targetX;
-        private float targetY;
         private boolean dialogShownTile15 = false;
+        private boolean killersInitialized = false;
+        private boolean[][] walkableGrid;
+        private int tileSize = 32;
+        private int mapWidth, mapHeight;
+
 
         public Joc(Game joc) {
             this.joc = joc;
@@ -77,7 +83,7 @@
             batch = worldStage.getBatch();
 
             // Zoom inicial
-            //worldCamera.zoom = 0.3f;
+            worldCamera.zoom = 0.3f;
 
             // --- CÀMERA DE UI (FIXA) ---
             uiCamera = new OrthographicCamera();
@@ -94,12 +100,21 @@
             // ---- MAPA TILED ----
             map = new TmxMapLoader().load("escenarios/disco/discoInici.tmx");
             mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
+            //buildWalkableGrid();
 
             // ------- PERSONATGE -------
             player = new Player();
             worldStage.addActor(player);
 
-            this.inventory = new Inventory(this.joc, this, killers[showKillers()]);
+            bolaDisco = new Image(AssetsManager.bolaDisco);
+            bolaDisco.setPosition(757, 985);
+            worldStage.addActor(bolaDisco);
+
+            killer = killers[showKillers()];
+
+            this.inventory = new Inventory(this.joc, this, killer);
+            this.options = new Options(this.joc, this);
+            this.investigation = new Investigation(this.joc, this, killer);
 
             skinPistes = new Skin();
             skinPistes.addRegions(AssetsManager.pistesIconAtlas);
@@ -113,23 +128,12 @@
         @Override
         public void show() {
 
-            // Input para Scene2D
-           // Gdx.input.setInputProcessor(worldStage);
-
-
             Actor worldInput = new Actor();
             worldInput.setBounds(
                 0, 0,
                 worldStage.getWidth(),
                 worldStage.getHeight()
             );
-
-//            // ---- MAPA TILED ----
-//            map = new TmxMapLoader().load("escenarios/disco/discoInici.tmx");
-//            mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
-
-            // Inicializar el gestor de colisiones
-            //collisionManager = new CollisionManager("escenarios/disco/disoMapPrueba.tmx");
 
             // --------- SKINS ---------
             skinOptionsIcon = new Skin();
@@ -144,18 +148,33 @@
                 "icons/notes/notes.json"
             ));
 
+            skinInvestigation = new Skin();
+            skinInvestigation.addRegions(AssetsManager.notesIconAtlas);
+            skinInvestigation.load(Gdx.files.internal(
+                "icons/notes/notes.json"
+            ));
+
             // --------- BOTONS ---------
             // Options Icon button
             btnOptionsIcon = new Button(skinOptionsIcon);
-            btnOptionsIcon.setSize(100, 120);
+            btnOptionsIcon.setSize(150, 150);
             btnOptionsIcon.setPosition(
-                924,
-                648
+                1560,
+                615
             );
+
+            // Acció del botó Options Icon
+            btnOptionsIcon.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    Gdx.app.log("OPTIONS", "Botó Options Icon");
+                    joc.setScreen(options);
+                }
+            });
 
             // Notes Icon
             btnInventory = new Button(skinInventory);
-            btnInventory.setSize(150, 170);
+            btnInventory.setSize(190, 170);
             btnInventory.setPosition(
                 0,
                 0
@@ -168,42 +187,49 @@
                     Gdx.app.log("INVENTORY", "Botó Notes");
                     Gdx.app.log("INVENTORY", "Notes: " + inventory.getNotes());
                     joc.setScreen(inventory);
-                    //dispose();
                 }
             });
 
-//            // Agregar un actor de fondo para ver si está capturando los eventos
-//            Actor background = new Actor();
-//            background.setBounds(0, 0, uiStage.getWidth(), uiStage.getHeight());
-//            background.setTouchable(Touchable.enabled);
-//            background.addListener(new ClickListener() {
-//                @Override
-//                public void clicked(InputEvent event, float x, float y) {
-//                    Gdx.app.log("BACKGROUND", "Click en fondo de UI en: " + x + ", " + y);
-//                }
-//            });
-//            uiStage.addActor(background);
+            // Botó Resolve
+            btnInvestigation = new Button(skinInvestigation);
+            btnInvestigation.setSize(190, 170);
+            btnInvestigation.setPosition(
+                1500,
+                0
+            );
+
+            // Acció del botó Resolve
+            btnInvestigation.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    Gdx.app.log("INVESTIGATION", "Botó Investigation");
+                    joc.setScreen(investigation);
+                }
+            });
+
             uiStage.addActor(btnOptionsIcon);
             uiStage.addActor(btnInventory);
-
-            // Pistes Icon
-            //pistes();
+            uiStage.addActor(btnInvestigation);
 
             // --------- DIÀLEG ---------
-            skinNomFont = new Skin(Gdx.files.internal("fonts/quantico_bold.json"), AssetsManager.dialogNomAtlas);
-            skinTextFont = new Skin(Gdx.files.internal("fonts/quantico_regular.json"), AssetsManager.dialogTextAtlas);
+            skinNomFont = new Skin(Gdx.files.internal("fonts/quantico_bold.json"),
+                AssetsManager.dialogNomAtlas);
+            skinTextFont = new Skin(Gdx.files.internal("fonts/quantico_regular.json"),
+                AssetsManager.dialogTextAtlas);
             db = new DialogBox(skinNomFont, skinTextFont);
             //uiStage.addActor(db);
 
             // --------- TIMER ---------
-            skinTimer = new Skin(Gdx.files.internal("fonts/quantico_bold.json"), AssetsManager.timerAtlas);
+            skinTimer = new Skin(Gdx.files.internal("fonts/quantico_bold.json"),
+                AssetsManager.timerAtlas);
             timerLabel = new Label("03:00", skinTimer);
             timerLabel.setPosition(40, 700);
             //uiStage.addActor(timerLabel);
 
             uiStage.addListener(new ClickListener() {
                 @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                public boolean touchDown(InputEvent event, float x, float y, int pointer,
+                                         int button) {
                     Gdx.app.log("UI_STAGE", "Touch down en UI: " + x + ", " + y);
                     return false;
                 }
@@ -237,16 +263,18 @@
                         player.moveTo(targetX, targetY);
                     } else {
                         if (inventory.getNotes() == 0) {
-                            db.typeTextMultiple(0, 1);
+                            db.setName(Player.PLAYER_NAME);
+                            db.typeTextMultiple(0, 1, Player.dialogsPlayer);
                             uiStage.addActor(db);
                         }
-                        Gdx.app.log("MOVIMIENTO", "No se puede mover");
+                        Gdx.app.log("MOVIMIENT", "No es pot moure");
                     }
 
                     // 4️⃣ Dialogos especiales
                     if (((int)(player.getX() / 32)) <= 15 && !dialogShownTile15) {
                         dialogShownTile15 = true;
-                        db.typeTextMultiple(1, 5);
+                        db.setName(Player.PLAYER_NAME);
+                        db.typeTextMultiple(1, 5, Player.dialogsPlayer);
                         uiStage.addActor(db);
                         inventory.incrementarNotes();
                         db.setOnFinishCallback(() -> {
@@ -280,71 +308,6 @@
                 0
             );
             worldCamera.update();
-
-//            if (Gdx.input.justTouched()) {
-//                if (db.hasParent()) {
-//                    db.onScreenClick();
-//                } else {
-//
-//                    // ---------- UI ----------
-//                    Vector2 uiTouch = new Vector2(
-//                        Gdx.input.getX(),
-//                        Gdx.input.getY()
-//                    );
-//                    uiStage.screenToStageCoordinates(uiTouch);
-//
-//                    Actor uiHit = uiStage.hit(uiTouch.x, uiTouch.y, true);
-//
-//                    // Si es toca la UI, Scene2D s'encarrega
-//                    if (uiHit != null) {
-//                        Gdx.app.log("TOUCH", "UI");
-//                        return;
-//                    }
-//
-//                    // ---------- MÓN ----------
-//                    Vector3 touch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-//                    worldStage.getCamera().unproject(touch);
-//
-//                    targetX = touch.x - player.getWidth() / 2f;
-//                    targetY = touch.y - (player.getHeight() - 95) / 2f;
-//
-//                    if (canMove(targetX, targetY)) {
-//
-//                        player.moveTo(targetX, targetY);
-//
-////                        if (db.isFinished()) {
-////                            db.remove(); // elimina del stage
-////                        }
-//
-//                    } else {
-//                        //db.setText(DialogBox.dialogs[0]);
-//                        if (inventory.getNotes() == 0) {
-//                            db.typeTextMultiple(0, 1);
-//                            uiStage.addActor(db);
-//                        }
-//                        Gdx.app.log("MOVIMIENTO", "No se puede mover");
-//                    }
-//
-//                    if (((int)(player.getX() / 32)) <= 15 && !dialogShownTile15) {
-//                        dialogShownTile15 = true;
-//                        db.typeTextMultiple(1, 5);
-//                        uiStage.addActor(db);
-//                        db.setOnFinishCallback(() -> {
-//                            inventory.incrementarNotes();
-//                            if (inventory.getNotes() == 1) {
-//                                showAllPistes();
-//                            } else if (inventory.getNotes() == 2) setTimerLabel(delta);
-//                            map = new TmxMapLoader().load("escenarios/disco/disoMapPrueba.tmx");
-//                            mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
-//                        });
-//                    }
-//
-//                    Gdx.app.log("MOVIMIENTO",
-//                        "Objetivo: " + targetX + ", " + targetY +
-//                            " | Tile: " + ((int)(targetX/32)) + ", " + ((int)(targetY/32)));
-//                }
-//            }
-
 
             // ---- DIBUIXAR MAPA ----
             mapRenderer.setView(worldCamera);
@@ -383,7 +346,6 @@
             if (worldStage != null) worldStage.dispose();
         }
 
-        // Prova 3 - canMove
         private boolean canMove(float nextX, float nextY) {
 
             float footHeight = 10f;
@@ -487,8 +449,8 @@
             btnPistes6 = new Button(skinPistes);
             btnPistes6.setSize(WIDTH_PISTES, HEIGHT_PISTES);
             btnPistes6.setPosition(
-                940,
-                990
+                1080,
+                1080
             );
             btnPistes6.addListener(new ClickListener() {
                 @Override
@@ -502,8 +464,8 @@
             btnPistes7 = new Button(skinPistes);
             btnPistes7.setSize(WIDTH_PISTES, HEIGHT_PISTES);
             btnPistes7.setPosition(
-                1360,
-                1270
+                1065,
+                1255
             );
             btnPistes7.addListener(new ClickListener() {
                 @Override
@@ -517,8 +479,8 @@
             btnPistes8 = new Button(skinPistes);
             btnPistes8.setSize(WIDTH_PISTES, HEIGHT_PISTES);
             btnPistes8.setPosition(
-                650,
-                1370
+                820,
+                1240
             );
             btnPistes8.addListener(new ClickListener() {
                 @Override
@@ -593,12 +555,14 @@
         private void accionBtns() {
             inventory.incrementarNotes();
             if (inventory.getNotes() == 2) {
-                db.typeTextMultiple(6, 7);
+                db.setName(Player.PLAYER_NAME);
+                db.typeTextMultiple(6, 7, Player.dialogsPlayer);
                 uiStage.addActor(db);
                 timerGame.start();
                 uiStage.addActor(timerLabel);
             } else {
-                db.typeTextMultiple(5, 6);
+                db.setName(Player.PLAYER_NAME);
+                db.typeTextMultiple(5, 6, Player.dialogsPlayer);
                 uiStage.addActor(db);
             }
         }
@@ -636,6 +600,13 @@
 
         private int showKillers() {
 
+//            if (killersInitialized) {
+//                for (int i = 0; i < killers.length; i++) {
+//                    worldStage.addActor(killers[i]);
+//                }
+//                return -1;
+//            }
+
             int k = 0;
 
             int[][] posicions = {
@@ -645,7 +616,7 @@
                 {935, 860}
             };
 
-            int killer = (int) (Math.random() * 3);
+            int killer = (int) (Math.random() * killers.length);
 
             for (int i = 0; i < killers.length; i++) {
                 killers[i].setPosition(posicions[i][0], posicions[i][1]);
@@ -656,9 +627,22 @@
                     Gdx.app.log("ASSASSÍ", "NOM " + killers[i].getNom());
                 }
 
+                Killer killerActual = killers[i];
+
+                killerActual.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        db.setName(killerActual.getNom());
+                        db.typeTextMultiple(0, 2, killerActual.getDialogs());
+                        uiStage.addActor(db);
+                    }
+                });
+
                 // Añadir al stage
                 worldStage.addActor(killers[i]);
             }
+
+            //killersInitialized = true;
 
             return k;
         }

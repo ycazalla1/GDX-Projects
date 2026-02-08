@@ -5,8 +5,14 @@ public class Victor extends Killer {
     public Victor(int idle) {
         super(AssetsManager.killerVictor, idle, "Victor");
         pistes = pistesVictor;
-
+        dialogs = dialogsVictor;
     }
+
+    public static final String[] dialogsVictor = {
+        "Si alguna cosa anava a passar, preferiria estar allà i afrontar-lo, " +
+            "que mirar cap a altre costat.",
+        "Va ser una situació complicada per a tots, ningú sabia molt bé bé què fer."
+    };
 
     public static final String[] pistesVictor = {
         "Fa molt de temps que són amics; malgrat això, hem arribat a aquesta situació. Va estar a prop de la zona.",

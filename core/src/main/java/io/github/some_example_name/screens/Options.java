@@ -6,10 +6,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 import io.github.some_example_name.assets.AssetsManager;
@@ -17,14 +20,17 @@ import io.github.some_example_name.assets.AssetsManager;
 public class Options implements Screen {
 
     private Game joc;
+    private Screen screen;
     private Stage stage;
     private Batch batch;
     private OrthographicCamera camara;
-    private Skin skinHome, skinBack;
+    private Skin skinHome, skinBack, skinLblTitle;
     private Button btnMenu, btnBack;
+    private Label lblTitle;
 
-    public Options(Game joc) {
+    public Options(Game joc, Screen screen) {
         this.joc = joc;
+        this.screen = screen;
 
         // Crear dimensions del joc
         camara = new OrthographicCamera(1024, 768);
@@ -45,14 +51,6 @@ public class Options implements Screen {
         // Input para Scene2D
         Gdx.input.setInputProcessor(stage);
 
-        // ---------- FONS ----------
-        Image fondo = new Image(AssetsManager.fonsMenu);
-        fondo.setSize(
-            stage.getViewport().getWorldWidth(),
-            stage.getViewport().getWorldHeight()
-        );
-        stage.addActor(fondo);
-
         // ---------- SKIN ----------
         skinHome = new Skin();
         skinHome.addRegions(AssetsManager.menuButtonAtlas);
@@ -66,23 +64,55 @@ public class Options implements Screen {
             "buttons/button_back/button_back.json"
         ));
 
+        skinLblTitle = new Skin();
+        skinLblTitle.addRegions(AssetsManager.dialogNomAtlas);
+        skinLblTitle.load(Gdx.files.internal(
+            "fonts/quantico_bold.json"
+        ));
+
+        // --------- LABEL ----------
+        lblTitle = new Label("OPTIONS", skinLblTitle);
+        lblTitle.setSize(250, 150);
+        lblTitle.setFontScale(4);
+        lblTitle.setPosition(
+            320,
+            560
+        );
+
         // --------- BOTONS ---------
         // Menu Button
         btnMenu = new Button(skinHome);
         btnMenu.setSize(250, 150);
         btnMenu.setPosition(
-            512 - 100,
-            384 - 40
+            512 - 376,
+            384 - 75
         );
+
+        // Acció del botó Menú
+        btnMenu.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                joc.setScreen(new Menu(joc));
+            }
+        });
 
         // Back Button
         btnBack = new Button(skinBack);
         btnBack.setSize(250, 150);
         btnBack.setPosition(
-            512 - 100,
-            384 - 40
+            512 + 135,
+            384 - 75
         );
 
+        // Acció del botó Back
+        btnBack.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                joc.setScreen(screen);
+            }
+        });
+
+        stage.addActor(lblTitle);
         stage.addActor(btnMenu);
         stage.addActor(btnBack);
     }
@@ -90,15 +120,8 @@ public class Options implements Screen {
     @Override
     public void render(float delta) {
         // Pinta la pantalla
-        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClearColor(0.89f, 0.80f,  0.64f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        batch.begin();
-
-        batch.draw(AssetsManager.fonsMenu,0,0, stage.getViewport().getWorldWidth(),
-            stage.getViewport().getWorldHeight());
-
-        batch.end();
 
         stage.act(delta);
         stage.draw();

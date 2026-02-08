@@ -5,8 +5,13 @@ public class Vera extends Killer{
     public Vera(int idle) {
         super(AssetsManager.killerVera, idle, "Vera");
         pistes = pistesVera;
-
+        dialogs = dialogsVera;
     }
+
+    public static final String[] dialogsVera = {
+        "Prefereixo pensar bé les coses abans de treure conclusions.",
+        "A vegades sobreviure significa saber quan avançar… i quan guardar silenci."
+    };
 
     public static final String[] pistesVera = {
         "Fa molt de temps que són amics; malgrat això, hem arribat a aquesta situació. Va estar a prop de la zona.",

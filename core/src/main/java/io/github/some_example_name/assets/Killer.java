@@ -16,9 +16,16 @@ public class Killer extends Actor {
     private float frameDuration = 0.30f;
     protected boolean isKiller;
     protected String nom;
-    protected String pistes[];
+    protected String pistes[], dialogs[];
     protected TextureRegion[][] frames;
 
+    /**
+     * Constructor de la classe Killer
+     *
+     * @param texture
+     * @param idle
+     * @param nom
+     */
     public Killer(Texture texture, int idle, String nom) {
 
         this.nom = nom;
@@ -41,18 +48,48 @@ public class Killer extends Actor {
         setSize(90, 130);
     }
 
+    /**
+     * Mètode getter per obtenir el nom del killer
+     *
+     * @return
+     */
     public String getNom() {
         return nom;
     }
 
+    /**
+     * Mètode getter per obtenir les pistes del killer
+     *
+     * @return
+     */
     public String[] getPistes() {
         return pistes;
     }
 
+    /**
+     * Mètode getter per obtenir els diàlegs del killer
+     *
+     * @return
+     */
+    public String[] getDialogs() {
+        return dialogs;
+    }
+
+    /**
+     * Mètode setter per indicar qui és el killer
+     *
+     * @param isKiller
+     */
     public void setIsKiller(boolean isKiller) {
         this.isKiller = isKiller;
     }
 
+    /**
+     * Mètode per indicar l'animació actual del killer
+     *
+     * @param idle
+     * @return
+     */
     protected Animation<TextureRegion> setCurrentAnimation(int idle) {
         if (idle == 0) {
             return idleRight;
@@ -67,6 +104,13 @@ public class Killer extends Actor {
         return null;
     }
 
+    /**
+     * Mètode per dibuixar l'animació del killer
+     *
+     * @param batch
+     * @param parentAlpha The parent alpha, to be multiplied with this actor's alpha, allowing the parent's alpha to affect all
+     *           children.
+     */
     @Override
     public void draw(Batch batch, float parentAlpha) {
         stateTime += Gdx.graphics.getDeltaTime();

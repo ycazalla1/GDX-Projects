@@ -15,7 +15,7 @@ public class Player extends Actor {
     private Animation<TextureRegion> walkFront, walkLeft, walkRight, walkBack;
     private Animation<TextureRegion> currentAnimation;
     private boolean moving = false;
-
+    public static final String PLAYER_NAME = "Penny";
     private float stateTime = 0f;
     private float frameDurationIdle = 0.30f, frameDurationWalk = 0.15f;
     private float speed = 200f;
@@ -64,20 +64,18 @@ public class Player extends Actor {
         setPosition(725, 600);
     }
 
+    public static String[] dialogsPlayer = {
+        "He de trobar el meu marit, em va dir que estava en els sofàs de l'esquerra.",
+        "Oooh déu meu!! És mort.",
+        "Hi ha una nota al seu costat, què serà?",
+        "Sembla una nota... Segurament hi haurà més d'una.",
+        "Penso trobar-les totes i descobrir qui és l'assassí!!! Me les pagarà!!!",
+        "Oooh, una nova nota!",
+        "En aquesta nota diu, que només tinc tres minuts per descobrir qui és l'assassí.",
+        "He trobat tres notes, això em porta a deduir la següent pista."
+    };
+
     public void moveTo(float targetX, float targetY) {
-
-//        direction.set(
-//            targetX - getX(),
-//            targetY - getY()
-//        ).nor();
-//
-//        // Cambiar animación según dirección
-//        if (Math.abs(direction.x) > Math.abs(direction.y)) {
-//            currentAnimation = direction.x > 0 ? walkRight : walkLeft;
-//        } else {
-//            currentAnimation = direction.y > 0 ? walkFront : walkBack;
-//        }
-
 
         target.set(targetX, targetY);
 

@@ -8,10 +8,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 public class AssetsManager {
     public static BitmapFont font;
     public static Texture killerVera, killerElena, killerVictor, killerTobias;
-    public static Texture fonsMenu, fonsJoc, player, fonsInventory, player4K, dialogBox, pistesImg;
+    public static Texture fonsMenu, fonsJoc, player, fonsInventory, player4K, dialogBoxInfo,
+        dialogBoxTalking, pistesImg, bolaDisco;
     public static TextureAtlas startButtonAtlas, optionsButtonAtlas, exitButtonAtlas,
                                 optionsIconButtonAtlas, pauseButtonAtlas, menuButtonAtlas,
                                 backButtonAtlas;
+    public static TextureAtlas killerVeraAtlas, killerElenaAtlas, killerVictorAtlas, killerTobiasAtlas;
     public static TextureAtlas notesIconAtlas, pistesIconAtlas;
     public static TextureAtlas dialogNomAtlas, dialogTextAtlas;
     public static TextureAtlas timerAtlas;
@@ -32,8 +34,11 @@ public class AssetsManager {
         killerTobias = new Texture(Gdx.files.internal("img/PJ/pj_m_2.png"));
 
         player4K = new Texture(Gdx.files.internal("img/PJ/pj_f_investic_4k.png"));
-        dialogBox = new Texture(Gdx.files.internal("img/dialog/pj_f_investic_dialog.png"));
+        dialogBoxTalking = new Texture(Gdx.files.internal("img/dialog/pj_f_investic_dialog.png"));
+        dialogBoxInfo = new Texture(Gdx.files.internal("img/dialog/dialog_box_info.png"));
         pistesImg = new Texture(Gdx.files.internal("img/notes/pistes.png"));
+
+        bolaDisco = new Texture(Gdx.files.internal("img/bola_disco.png"));
 
         // --------------- BUTTONS ---------------
         // Button start
@@ -68,6 +73,22 @@ public class AssetsManager {
 
         backButtonAtlas = new TextureAtlas(
             Gdx.files.internal("buttons/button_back/button_back.atlas")
+        );
+
+        killerVeraAtlas = new TextureAtlas(
+            Gdx.files.internal("buttons/killers/vera_button_killer.atlas")
+        );
+
+        killerElenaAtlas = new TextureAtlas(
+            Gdx.files.internal("buttons/killers/elena_button_killer.atlas")
+        );
+
+        killerVictorAtlas = new TextureAtlas(
+            Gdx.files.internal("buttons/killers/victor_button_killer.atlas")
+        );
+
+        killerTobiasAtlas = new TextureAtlas(
+            Gdx.files.internal("buttons/killers/tobias_button_killer.atlas")
         );
 
         // --------------- ICONS ---------------
