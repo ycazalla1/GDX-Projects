@@ -3,6 +3,7 @@
     import com.badlogic.gdx.Game;
     import com.badlogic.gdx.Gdx;
     import com.badlogic.gdx.InputMultiplexer;
+    import com.badlogic.gdx.audio.Sound;
     import com.badlogic.gdx.graphics.GL20;
     import com.badlogic.gdx.graphics.OrthographicCamera;
     import com.badlogic.gdx.graphics.g2d.Batch;
@@ -67,7 +68,7 @@
 
         public Joc(Game joc) {
             this.joc = joc;
-            this.timerGame = new TimerGame();
+            //this.timerGame = new TimerGame();
 
             // --- CÀMERA DEL MÓN ---
             worldCamera = new OrthographicCamera();
@@ -97,12 +98,12 @@
             //multiplexer.addProcessor(uiStage);
             //multiplexer.addProcessor(worldStage);
 
-            // ---- MAPA TILED ----
+            // -------- MAPA TILED --------
             map = new TmxMapLoader().load("escenarios/disco/discoInici.tmx");
             mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
             //buildWalkableGrid();
 
-            // ------- PERSONATGE -------
+            // -------- PERSONATGE --------
             player = new Player();
             worldStage.addActor(player);
 
@@ -127,7 +128,6 @@
 
         @Override
         public void show() {
-
             Actor worldInput = new Actor();
             worldInput.setBounds(
                 0, 0,
@@ -280,7 +280,7 @@
                         db.setOnFinishCallback(() -> {
                             Gdx.app.log("INVENTORY", "Notes: " + inventory.getNotes());
                             if (inventory.getNotes() == 1) showAllNotes();
-                            else if (inventory.getNotes() == 2) setTimerLabel(0);
+                            //else if (inventory.getNotes() == 2) setTimerLabel(0);
                             map = new TmxMapLoader().load("escenarios/disco/disoMapPrueba.tmx");
                             mapRenderer = new OrthogonalTiledMapRenderer(map, 1f);
                         });
@@ -299,7 +299,7 @@
         @Override
         public void render(float delta) {
             // Pinta la pantalla
-            Gdx.gl.glClearColor(0, 0, 0, 1);
+            Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             worldCamera.position.set(
@@ -554,6 +554,7 @@
 
         private void accionBtns() {
             inventory.incrementarNotes();
+            SoundGame.notesSound.play(0.2f);
             if (inventory.getNotes() == 2) {
                 db.setName(Player.PLAYER_NAME);
                 db.typeTextMultiple(6, 7, Player.dialogsPlayer);
@@ -567,21 +568,21 @@
             }
         }
 
-        private void setTimerLabel(float delta) {
-            timerGame.update(delta);
-            float remainingTime = TOTAL_TIME - timerGame.getElapsedTime();
-
-            if (remainingTime < 0) {
-                remainingTime = 0;
-            }
-
-            // Convertir a minutos y segundos
-            int minutes = (int)(remainingTime / 60);
-            int seconds = (int)(remainingTime % 60);
-
-            // Format MM:SS
-            timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
-        }
+//        private void setTimerLabel(float delta) {
+//            timerGame.update(delta);
+//            float remainingTime = TOTAL_TIME - timerGame.getElapsedTime();
+//
+//            if (remainingTime < 0) {
+//                remainingTime = 0;
+//            }
+//
+//            // Convertir a minutos y segundos
+//            int minutes = (int)(remainingTime / 60);
+//            int seconds = (int)(remainingTime % 60);
+//
+//            // Format MM:SS
+//            timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
+//        }
 
         private void showAllNotes() {
             btnPistes1.remove();

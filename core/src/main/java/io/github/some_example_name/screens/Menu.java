@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 
 import io.github.some_example_name.assets.AssetsManager;
+import io.github.some_example_name.assets.SoundGame;
 
 
 public class Menu implements Screen {
@@ -31,6 +32,14 @@ public class Menu implements Screen {
     public Menu(Game joc) {
 
         this.joc = joc;
+
+        // ----- SOUNDS AND MUSIC -----
+        SoundGame.loadSound();
+        SoundGame.loadMusic();
+
+        SoundGame.musicGame.setLooping(true);
+        SoundGame.musicGame.setVolume(0.3f);
+        SoundGame.musicGame.play();
 
         // Crear dimensions del joc
         camara = new OrthographicCamera(1024, 768);

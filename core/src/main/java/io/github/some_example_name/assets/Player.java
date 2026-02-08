@@ -16,6 +16,7 @@ public class Player extends Actor {
     private Animation<TextureRegion> currentAnimation;
     private boolean moving = false;
     public static final String PLAYER_NAME = "Penny";
+    private long walkingSoundId = -1;
     private float stateTime = 0f;
     private float frameDurationIdle = 0.30f, frameDurationWalk = 0.15f;
     private float speed = 200f;
@@ -77,6 +78,11 @@ public class Player extends Actor {
 
     public void moveTo(float targetX, float targetY) {
 
+        if (walkingSoundId == -1) {
+            walkingSoundId = SoundGame.walkingSound.loop();
+            SoundGame.walkingSound.setVolume(walkingSoundId, 1.0f);
+        }
+
         target.set(targetX, targetY);
 
         direction.set(
@@ -87,6 +93,8 @@ public class Player extends Actor {
         // Aturar el personatge quan arriba al punt senyalat
         if (direction.len() < 5f) {
             moving = false;
+            SoundGame.walkingSound.stop(walkingSoundId);
+            walkingSoundId = -1;
             return;
         }
 
@@ -115,6 +123,8 @@ public class Player extends Actor {
         // Comprovar si ha arribat el personatge al punt senyalat
         if (Vector2.dst(getX(), getY(), target.x, target.y) < 5f) {
             setPosition(target.x, target.y);
+            SoundGame.walkingSound.stop(walkingSoundId);
+            walkingSoundId = -1;
             moving = false;
 
             if (Math.abs(direction.x) > Math.abs(direction.y)) {

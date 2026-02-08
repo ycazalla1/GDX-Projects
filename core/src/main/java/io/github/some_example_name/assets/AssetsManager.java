@@ -9,13 +9,13 @@ public class AssetsManager {
     public static BitmapFont font;
     public static Texture killerVera, killerElena, killerVictor, killerTobias;
     public static Texture fonsMenu, fonsJoc, player, fonsInventory, player4K, dialogBoxInfo,
-        dialogBoxTalking, pistesImg, bolaDisco;
+        dialogBoxTalking, pistesImg, bolaDisco, titleGame;
     public static TextureAtlas startButtonAtlas, optionsButtonAtlas, exitButtonAtlas,
                                 optionsIconButtonAtlas, pauseButtonAtlas, menuButtonAtlas,
                                 backButtonAtlas;
     public static TextureAtlas killerVeraAtlas, killerElenaAtlas, killerVictorAtlas, killerTobiasAtlas;
     public static TextureAtlas notesIconAtlas, pistesIconAtlas;
-    public static TextureAtlas dialogNomAtlas, dialogTextAtlas;
+    public static TextureAtlas dialogNomAtlas, dialogTextAtlas, creditsAtlas;
     public static TextureAtlas timerAtlas;
 
     public static void load() {
@@ -24,8 +24,12 @@ public class AssetsManager {
         fonsJoc = new Texture(Gdx.files.internal("img/disco.png"));
         fonsInventory = new Texture(Gdx.files.internal("img/inventory.png"));
 
+        // Title/Logo
+        titleGame = new Texture(Gdx.files.internal("img/logo/logo.png"));
+
         // Player
         player = new Texture(Gdx.files.internal("img/PJ/pj_f_investic_1.png"));
+        player4K = new Texture(Gdx.files.internal("img/PJ/pj_f_investic_4k.png"));
 
         // Killers
         killerVera = new Texture(Gdx.files.internal("img/PJ/pj_f_1.png"));
@@ -33,11 +37,12 @@ public class AssetsManager {
         killerVictor = new Texture(Gdx.files.internal("img/PJ/pj_m_1.png"));
         killerTobias = new Texture(Gdx.files.internal("img/PJ/pj_m_2.png"));
 
-        player4K = new Texture(Gdx.files.internal("img/PJ/pj_f_investic_4k.png"));
+        // Diàlegs
         dialogBoxTalking = new Texture(Gdx.files.internal("img/dialog/pj_f_investic_dialog.png"));
         dialogBoxInfo = new Texture(Gdx.files.internal("img/dialog/dialog_box_info.png"));
-        pistesImg = new Texture(Gdx.files.internal("img/notes/pistes.png"));
 
+        // Resources
+        pistesImg = new Texture(Gdx.files.internal("img/notes/pistes.png"));
         bolaDisco = new Texture(Gdx.files.internal("img/bola_disco.png"));
 
         // --------------- BUTTONS ---------------
@@ -100,7 +105,7 @@ public class AssetsManager {
             Gdx.files.internal("icons/pistes/pistes.atlas")
         );
 
-        // --------------- DIALOG ---------------
+        // --------------- FONTS ---------------
         // Carraguem la font
         dialogNomAtlas = new TextureAtlas(
             Gdx.files.internal("fonts/quantico_bold.atlas")
@@ -108,6 +113,10 @@ public class AssetsManager {
 
         dialogTextAtlas = new TextureAtlas(
             Gdx.files.internal("fonts/quantico_regular.atlas")
+        );
+
+        creditsAtlas = new TextureAtlas(
+            Gdx.files.internal("fonts/credits/quantico_bold_credits.atlas")
         );
 
         // --------------- TIMER ---------------

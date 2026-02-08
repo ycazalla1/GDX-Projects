@@ -146,13 +146,6 @@ public class Inventory implements Screen {
             "buttons/button_back/button_back.json"
         ));
 
-        /*// Options button
-        skinOptions = new Skin();
-        skinOptions.addRegions(AssetsManager.optionsButtonAtlas);
-        skinOptions.load(Gdx.files.internal(
-            "buttons/button_options/button_options.json"
-        ));*/
-
         // --------- BOTONS ---------
         // Back button
         btnBack = new Button(skinBack);

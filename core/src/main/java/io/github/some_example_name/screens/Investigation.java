@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import io.github.some_example_name.assets.AssetsManager;
 import io.github.some_example_name.assets.DialogBox;
 import io.github.some_example_name.assets.Killer;
+import io.github.some_example_name.assets.SoundGame;
 
 public class Investigation implements Screen {
 
@@ -209,10 +210,15 @@ public class Investigation implements Screen {
 
 
         if (name.equals(killer.getNom())) {
+            //SoundGame.winSound.play(1f);
             String[] info = {
                 name + " és l'assassí. Enhorabona es resolt el cas."
             };
             db.typeTextMultiple(0, 1, info);
+            db.setOnFinishCallback(() -> {
+                joc.setScreen(new EndGame(this.joc, this, true));
+                dispose();
+            });
             stage.addActor(db);
         } else {
             intents--;
@@ -221,7 +227,12 @@ public class Investigation implements Screen {
                 name + " no és l'assassí. Et queda " + intents + " intent."
             };
             if (intents == 0) {
+                //SoundGame.loseSound.play(1f);
                 db.typeTextMultiple(0,1, info);
+                db.setOnFinishCallback(() -> {
+                    joc.setScreen(new EndGame(this.joc, this, false));
+                    dispose();
+                });
                 stage.addActor(db);
             } else {
                 db.typeTextMultiple(1,2, info);
