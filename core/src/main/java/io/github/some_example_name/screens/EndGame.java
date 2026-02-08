@@ -53,7 +53,7 @@ public class EndGame implements Screen {
     @Override
     public void show() {
         if (win) {
-            SoundGame.winSound.play(1f);
+            SoundGame.winSound.play(0.5f);
         } else {
             SoundGame.loseSound.play(0.2f);
         }

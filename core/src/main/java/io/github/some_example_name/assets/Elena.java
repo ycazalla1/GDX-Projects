@@ -6,6 +6,7 @@ public class Elena extends Killer {
         super(AssetsManager.killerElena, idle, "Elena");
         pistes = pistesElena;
         dialogs = dialogsElena;
+        textureDialog = AssetsManager.dialogBoxElena;
     }
 
     public static final String[] dialogsElena = {

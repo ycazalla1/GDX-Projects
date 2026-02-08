@@ -18,6 +18,7 @@ public class Killer extends Actor {
     protected String nom;
     protected String pistes[], dialogs[];
     protected TextureRegion[][] frames;
+    protected Texture textureDialog;
 
     /**
      * Constructor de la classe Killer
@@ -55,6 +56,10 @@ public class Killer extends Actor {
      */
     public String getNom() {
         return nom;
+    }
+
+    public Texture getTextureDialog() {
+        return textureDialog;
     }
 
     /**

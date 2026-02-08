@@ -1,5 +1,6 @@
 package io.github.some_example_name.assets;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -20,12 +21,13 @@ public class DialogBox extends Table {
     private boolean finished;
     private Runnable onFinishCallback;
     private Timer.Task typingTask;
+    //private Texture textureDialog = AssetsManager.dialogBoxTalking;
 
-    public DialogBox(Skin skinNom, Skin skinText) {
+    public DialogBox(Skin skinNom, Skin skinText, Texture textureDialog) {
         setFillParent(true);
         bottom().pad(20);
 
-        NinePatch ninePatch = new NinePatch(AssetsManager.dialogBoxTalking,
+        NinePatch ninePatch = new NinePatch(textureDialog,
             10, 10, 10, 10);
         NinePatchDrawable dialogBoxDrawable = new NinePatchDrawable(ninePatch);
 
@@ -111,6 +113,10 @@ public class DialogBox extends Table {
     public void setText(String text) {
         this.textLabel.setText(text);
     }
+
+//    public void setTextureDialog(Texture texture) {
+//        this.textureDialog = texture;
+//    }
 
     public void setName(String name) {
         this.nameLabel.setText(name);

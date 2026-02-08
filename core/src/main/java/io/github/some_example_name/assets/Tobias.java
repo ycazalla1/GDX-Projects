@@ -6,6 +6,7 @@ public class Tobias extends Killer {
         super(AssetsManager.killerTobias, idle, "Tobias");
         pistes = pistesTobias;
         dialogs = dialogsTobias;
+        textureDialog = AssetsManager.dialogBoxTobias;
     }
 
     public static final String[] dialogsTobias = {

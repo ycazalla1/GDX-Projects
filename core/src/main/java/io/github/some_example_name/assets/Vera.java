@@ -6,6 +6,7 @@ public class Vera extends Killer{
         super(AssetsManager.killerVera, idle, "Vera");
         pistes = pistesVera;
         dialogs = dialogsVera;
+        textureDialog = AssetsManager.dialogBoxVera;
     }
 
     public static final String[] dialogsVera = {

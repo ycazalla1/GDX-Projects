@@ -149,9 +149,9 @@
             ));
 
             skinInvestigation = new Skin();
-            skinInvestigation.addRegions(AssetsManager.notesIconAtlas);
+            skinInvestigation.addRegions(AssetsManager.llupaIconAtlas);
             skinInvestigation.load(Gdx.files.internal(
-                "icons/notes/notes.json"
+                "icons/investigation/llupa.json"
             ));
 
             // --------- BOTONS ---------
@@ -216,7 +216,7 @@
                 AssetsManager.dialogNomAtlas);
             skinTextFont = new Skin(Gdx.files.internal("fonts/quantico_regular.json"),
                 AssetsManager.dialogTextAtlas);
-            db = new DialogBox(skinNomFont, skinTextFont);
+            db = new DialogBox(skinNomFont, skinTextFont, AssetsManager.dialogBoxTalking);
             //uiStage.addActor(db);
 
             // --------- TIMER ---------
@@ -263,6 +263,7 @@
                         player.moveTo(targetX, targetY);
                     } else {
                         if (inventory.getNotes() == 0) {
+                            db = new DialogBox(skinNomFont, skinTextFont, AssetsManager.dialogBoxTalking);
                             db.setName(Player.PLAYER_NAME);
                             db.typeTextMultiple(0, 1, Player.dialogsPlayer);
                             uiStage.addActor(db);
@@ -273,6 +274,7 @@
                     // 4️⃣ Dialogos especiales
                     if (((int)(player.getX() / 32)) <= 15 && !dialogShownTile15) {
                         dialogShownTile15 = true;
+                        db = new DialogBox(skinNomFont, skinTextFont, AssetsManager.dialogBoxTalking);
                         db.setName(Player.PLAYER_NAME);
                         db.typeTextMultiple(1, 5, Player.dialogsPlayer);
                         uiStage.addActor(db);
@@ -556,33 +558,19 @@
             inventory.incrementarNotes();
             SoundGame.notesSound.play(0.2f);
             if (inventory.getNotes() == 2) {
+                db = new DialogBox(skinNomFont, skinTextFont, AssetsManager.dialogBoxTalking);
                 db.setName(Player.PLAYER_NAME);
                 db.typeTextMultiple(6, 7, Player.dialogsPlayer);
                 uiStage.addActor(db);
                 timerGame.start();
                 uiStage.addActor(timerLabel);
             } else {
+                db = new DialogBox(skinNomFont, skinTextFont, AssetsManager.dialogBoxTalking);
                 db.setName(Player.PLAYER_NAME);
                 db.typeTextMultiple(5, 6, Player.dialogsPlayer);
                 uiStage.addActor(db);
             }
         }
-
-//        private void setTimerLabel(float delta) {
-//            timerGame.update(delta);
-//            float remainingTime = TOTAL_TIME - timerGame.getElapsedTime();
-//
-//            if (remainingTime < 0) {
-//                remainingTime = 0;
-//            }
-//
-//            // Convertir a minutos y segundos
-//            int minutes = (int)(remainingTime / 60);
-//            int seconds = (int)(remainingTime % 60);
-//
-//            // Format MM:SS
-//            timerLabel.setText(String.format("%02d:%02d", minutes, seconds));
-//        }
 
         private void showAllNotes() {
             btnPistes1.remove();
@@ -600,13 +588,6 @@
         }
 
         private int showKillers() {
-
-//            if (killersInitialized) {
-//                for (int i = 0; i < killers.length; i++) {
-//                    worldStage.addActor(killers[i]);
-//                }
-//                return -1;
-//            }
 
             int k = 0;
 
@@ -633,6 +614,7 @@
                 killerActual.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
+                        db = new DialogBox(skinNomFont, skinTextFont, killerActual.getTextureDialog());
                         db.setName(killerActual.getNom());
                         db.typeTextMultiple(0, 2, killerActual.getDialogs());
                         uiStage.addActor(db);

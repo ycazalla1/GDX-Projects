@@ -136,8 +136,6 @@ public class Inventory implements Screen {
         // Input para Scene2D
         Gdx.input.setInputProcessor(stage);
 
-
-
         // --------- SKINS ---------
         // Back button
         skinBack = new Skin();

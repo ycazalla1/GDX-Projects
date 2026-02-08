@@ -6,6 +6,7 @@ public class Victor extends Killer {
         super(AssetsManager.killerVictor, idle, "Victor");
         pistes = pistesVictor;
         dialogs = dialogsVictor;
+        textureDialog = AssetsManager.dialogBoxVictor;
     }
 
     public static final String[] dialogsVictor = {
